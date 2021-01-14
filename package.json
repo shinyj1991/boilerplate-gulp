@@ -1,0 +1,34 @@
+{
+  "name": "boilerplate_gulp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shinyj1991/boilerplate_gulp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shinyj1991/boilerplate_gulp/issues"
+  },
+  "homepage": "https://github.com/shinyj1991/boilerplate_gulp#readme",
+  "devDependencies": {
+    "browser-sync": "^2.26.13",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-file-include": "^2.3.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-uglify": "^3.0.2",
+    "path": "^0.12.7"
+  },
+  "dependencies": {
+    "natives": "^1.1.6"
+  }
+}
