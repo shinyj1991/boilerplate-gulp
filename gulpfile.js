@@ -8,68 +8,72 @@ var rename = require('gulp-rename');
 var sass = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var fileinclude = require('gulp-file-include');
-var browserSync = require('browser-sync').create();
+var browsersync = require('browser-sync').create();
 
-gulp.task('server', ['allfile', 'html', 'scss'], function () {
-    browserSync.init({
-        port: 1234,
-        server: {
-            baseDir: 'project/dist'
-        }
-    });
-    gulp.watch([
-        'project/src/**/*.*',
-        '!project/src/**/*.html',
-        '!project/src/views/_include/**/*',
-        '!project/src/**/*.scss'
-    ], ['allfile']);
-    gulp.watch('project/src/**/*.html', ['html']);
-    gulp.watch('project/src/assets/scss/**/*.scss', ['scss']);
-    gulp.watch('project/src/**', function (e) {
-        if (e.type === 'deleted') {
-            var filePathFromSrc = path.relative(path.resolve('project/src/'), e.path);
-            var destFilePath = path.resolve('project/dist/', filePathFromSrc);
-            del.sync(destFilePath);
-        }
-    });
-    gulp.watch('project/dist/**/*.*', browserSync.reload);
-});
+function browserSync(done) {
+  browsersync.init({
+    server: {
+      baseDir: 'dist'
+    },
+    port: 3000
+  });
+  done();
+}
 
-gulp.task('allfile', function () {
-    return gulp
-        .src([
-            'project/src/**/*.*',
-            '!project/src/**/*.html',
-            '!project/src/views/_include/**/*',
-            '!project/src/**/*.scss'
-        ])
-        .pipe(gulp.dest('project/dist'))
-});
+function browserSyncReload(done) {
+  browsersync.reload();
+  done();
+}
 
-gulp.task('html', function () {
-    return gulp
-        .src('project/src/**/*.html')
-        .pipe(fileinclude({
-            prefix: '@@',
-            basepath: './project/src/'
-        }))
-        .pipe(gulp.dest('project/dist'))
-});
+function clean() {
+  return del('dist');
+}
 
-gulp.task('scss', function () {
-    return gulp
-        .src('project/src/assets/scss/**/*.scss')
-        .pipe(sass({
-            outputStyle: 'compressed'
-        }).on('error', sass.logError))
-        .pipe(autoprefixer({
-            browsers: ['last 2 versions', 'ie >= 9']
-        }))
-        .pipe(gulp.dest('project/src/assets/css'))
-});
+function asset() {
+  return gulp
+    .src([
+      'src/_static/**/*.*',
+      '!src/_static/**/*.scss'
+    ])
+    .pipe(gulp.dest('dist'))
+}
 
-gulp.task('clean', function () {
-    return del('project/dist');
-});
+function html() {
+  return gulp
+    .src('src/**/*.html')
+    .pipe(fileinclude({
+      prefix: '@@',
+      basepath: './src/'
+    }))
+    .pipe(gulp.dest('dist'))
+}
 
-gulp.task('default', ['server']);
+function scss() {
+  return gulp
+    .src('src/_static/**/*.scss')
+    .pipe(sass({
+      outputStyle: 'compressed'
+    })
+    .on('error', sass.logError))
+    .pipe(autoprefixer({
+      overrideBrowserslist: ['last 2 versions', 'ie >= 9']
+    }))
+    .pipe(concat('style.css'))
+    .pipe(gulp.dest('src/_static/css'))
+}
+
+function watchFile() {
+  gulp.watch('src/**/*.html', html);
+  gulp.watch('src/_static/**/*.scss', scss);
+  gulp.watch([
+    'src/_static/**/*.*',
+    '!src/_static/**/*.scss'
+  ], asset);
+  gulp.watch('dist/**/*.*', browserSyncReload);
+}
+
+const build = gulp.series(clean, scss, asset, html);
+const watch = gulp.parallel(watchFile, browserSync);
+
+exports.watch = watch;
+exports.default = build;
