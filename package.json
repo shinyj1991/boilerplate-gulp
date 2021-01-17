@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "gulp-cli": "^2.3.0",
-    "natives": "^1.1.6"
+    "natives": "^1.1.6",
+    "node-sass": "^5.0.0"
   }
 }
