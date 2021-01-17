@@ -38,6 +38,10 @@ function asset() {
     .pipe(gulp.dest('dist'))
 }
 
+function cleanHtml() {
+  return del('dist/**/*.html');
+}
+
 function html() {
   return gulp
     .src('src/**/*.html')
@@ -46,6 +50,14 @@ function html() {
       basepath: './src/'
     }))
     .pipe(gulp.dest('dist'))
+}
+
+function cleanAsset() {
+  return del([
+    'dist/css',
+    'dist/images',
+    'dist/js'
+  ]);
 }
 
 function scss() {
@@ -63,12 +75,12 @@ function scss() {
 }
 
 function watchFile() {
-  gulp.watch('src/**/*.html', html);
+  gulp.watch('src/**/*.html', gulp.series(cleanHtml, html));
   gulp.watch('src/_static/**/*.scss', scss);
   gulp.watch([
     'src/_static/**/*.*',
     '!src/_static/**/*.scss'
-  ], asset);
+  ], gulp.series(cleanAsset, asset));
   gulp.watch('dist/**/*.*', browserSyncReload);
 }
 
